@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum estado_cita {
+  SOLICITADA
+  CONFIRMADA
+}
+
+model obras_sociales {
+  id         Int       @id @default(autoincrement())
+  nombre     String    @unique
+  activa     Boolean   @default(true)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+
+  pacientes  pacientes[]
+  citas      citas[]
+}
+
+model pacientes {
+  id             Int            @id @default(autoincrement())
+  nombre         String
+  apellido       String
+  telefono       String
+  email          String
+  obra_social_id Int
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now())
+
+  obras_sociales obras_sociales @relation(fields: [obra_social_id], references: [id])
+  citas          citas[]
+}
+
+model citas {
+  id                 Int          @id @default(autoincrement())
+  paciente_id        Int
+  obra_social_id     Int
+  fecha_hora         DateTime
+  estado             estado_cita  @default(SOLICITADA)
+  fecha_confirmacion DateTime?
+  comentarios        String?
+  created_at         DateTime     @default(now())
+  updated_at         DateTime     @default(now())
+
+  pacientes      pacientes       @relation(fields: [paciente_id], references: [id])
+  obras_sociales obras_sociales  @relation(fields: [obra_social_id], references: [id])
+}
+
+model usuarios_admin {
+  id            Int      @id @default(autoincrement())
+  usuario       String   @unique
+  password_hash String
+  rol           String?  @default("ADMIN")
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+}
+
+model horarios_atencion {
+  id                     Int      @id @default(autoincrement())
+  dia_semana             Int
+  hora_inicio            DateTime
+  hora_fin               DateTime
+  duracion_turno_minutos Int      @default(30)
+}
