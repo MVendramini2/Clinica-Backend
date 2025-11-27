@@ -9,10 +9,10 @@ import {
 
 const router = Router();
 
-// 📌 GET público — para el formulario del paciente
+// GET público — para el formulario del paciente
 router.get("/", getObrasSociales);
 
-// 📌 Rutas protegidas — para el panel admin
+// Rutas protegidas — para el panel admin
 router.post("/", authMiddleware, createObraSocial);
 router.put("/:id", authMiddleware, updateObraSocial);
 router.delete("/:id", authMiddleware, deleteObraSocial);

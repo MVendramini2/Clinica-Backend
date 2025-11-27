@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "../config/prisma";
 
-// 📌 Crear una cita desde la reserva pública
+// Crear cita
 export const crearCita = async (req: Request, res: Response) => {
   try {
     const { pacienteId, fechaHora } = req.body;
@@ -34,7 +34,7 @@ export const crearCita = async (req: Request, res: Response) => {
   }
 };
 
-// 📌 Obtener citas para el panel administrativo
+// Listado de Citas
 export const obtenerCitas = async (_req: Request, res: Response) => {
   try {
     const citas = await prisma.citas.findMany({
@@ -63,7 +63,7 @@ export const obtenerCitas = async (_req: Request, res: Response) => {
   }
 };
 
-// 📌 Confirmar cita
+// Confirmar cita
 export const confirmarCita = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -84,6 +84,7 @@ export const confirmarCita = async (req: Request, res: Response) => {
 
 };
 
+// Eliminar cita
 export const eliminarCita = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

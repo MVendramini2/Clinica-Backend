@@ -13,7 +13,7 @@ const toLocalKey = (d: Date): string => {
 
 export const getDisponibilidad = async (req: Request, res: Response) => {
   try {
-    // 1) Rango de fechas (por defecto: hoy → hoy+14)
+    // Rango de fechas 
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
@@ -39,7 +39,7 @@ export const getDisponibilidad = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "El rango de fechas es inválido" });
     }
 
-    // 2) Traer TODAS las citas en ese rango (sin filtrar por estado)
+    // 2) Traer citas en ese rango de fechas
     const citas = await prisma.citas.findMany({
       where: {
         fecha_hora: {
@@ -64,13 +64,13 @@ export const getDisponibilidad = async (req: Request, res: Response) => {
     cursor.setHours(0, 0, 0, 0);
 
     while (cursor <= end) {
-      const diaSemana = cursor.getDay(); // 0=Dom, 1=Lun...
+      const diaSemana = cursor.getDay(); 
 
-      // Ejemplo: sólo lunes a viernes
+      
       if (diaSemana >= 1 && diaSemana <= 5) {
         const bloques = [
-          { desde: 8, hasta: 12 },  // 08-12
-          { desde: 14, hasta: 18 }, // 14-18
+          { desde: 8, hasta: 12 },  
+          { desde: 14, hasta: 18 }, 
         ];
 
         for (const bloque of bloques) {

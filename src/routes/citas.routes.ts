@@ -9,14 +9,13 @@ import {
 
 const router = Router();
 
-// Crear cita (público)
-// 👉 la ruta correcta es "/"
+// Crear cita 
 router.post("/", crearCita);
 
-// PROTEGER TODO LO DEMÁS
+// PROTEGER TODO 
 router.use(authMiddleware);
 
-// Listar citas (panel admin)
+// Listar citas 
 router.get("/", obtenerCitas);
 
 // Confirmar cita

@@ -13,7 +13,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Usuario y contraseña son obligatorios" });
     }
 
-    // Busca el usuario admin en la tabla usuarios_admin
+    // Busca el usuario en la tabla usuarios_admin
     const user = await prisma.usuarios_admin.findFirst({
       where: { usuario },
     });
