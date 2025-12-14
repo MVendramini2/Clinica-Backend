@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { prisma } from "../config/prisma";
+import { sendEmailCita } from "../services/email.services"; 
 
 // Crear cita
 export const crearCita = async (req: Request, res: Response) => {
@@ -10,6 +11,7 @@ export const crearCita = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Datos incompletos" });
     }
 
+    
     const paciente = await prisma.pacientes.findUnique({
       where: { id: Number(pacienteId) },
     });
@@ -27,6 +29,14 @@ export const crearCita = async (req: Request, res: Response) => {
       },
     });
 
+    
+    if (paciente.email) {
+      void sendEmailCita(paciente.email, 'creada', {
+        fecha: nuevaCita.fecha_hora,
+        nombrePaciente: paciente.nombre 
+      });
+    }
+
     return res.status(201).json(nuevaCita);
   } catch (error) {
     console.error("Error al crear cita:", error);
@@ -34,7 +44,7 @@ export const crearCita = async (req: Request, res: Response) => {
   }
 };
 
-// Listado de Citas
+// Listado de Citas 
 export const obtenerCitas = async (_req: Request, res: Response) => {
   try {
     const citas = await prisma.citas.findMany({
@@ -45,7 +55,6 @@ export const obtenerCitas = async (_req: Request, res: Response) => {
       }
     });
 
-    // Transformación al formato que tu front espera
     const citasFormateadas = citas.map((cita: any) => ({
       id: cita.id,
       paciente: `${cita.pacientes.nombre} ${cita.pacientes.apellido}`,
@@ -63,7 +72,7 @@ export const obtenerCitas = async (_req: Request, res: Response) => {
   }
 };
 
-// Confirmar cita
+// Confirmar cita 
 export const confirmarCita = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -81,7 +90,6 @@ export const confirmarCita = async (req: Request, res: Response) => {
     console.error("Error al confirmar cita:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
-
 };
 
 // Eliminar cita
@@ -89,8 +97,10 @@ export const eliminarCita = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
+    
     const cita = await prisma.citas.findUnique({
       where: { id: Number(id) },
+      include: { pacientes: true } 
     });
 
     if (!cita) {
@@ -100,6 +110,14 @@ export const eliminarCita = async (req: Request, res: Response) => {
     await prisma.citas.delete({
       where: { id: Number(id) },
     });
+
+
+    if (cita.pacientes && cita.pacientes.email) {
+      void sendEmailCita(cita.pacientes.email, 'eliminada', {
+        fecha: cita.fecha_hora,
+        nombrePaciente: cita.pacientes.nombre
+      });
+    }
 
     return res.json({ message: "Cita eliminada correctamente" });
   } catch (error) {
